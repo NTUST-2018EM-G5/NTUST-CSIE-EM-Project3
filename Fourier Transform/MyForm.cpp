@@ -2,11 +2,11 @@
 using namespace System;
 using namespace System::Windows::Forms;
 
-[STAThreadAttribute]
-void Main(cli::array<System::String^>^ args)
+[STAThread]
+int main(array<String^>^ argv)
 {
 	Application::EnableVisualStyles();
 	Application::SetCompatibleTextRenderingDefault(false);
-	NTUSTCSIEEMProject3::MyForm form;
-	Application::Run(%form);
+	FourierTransform::MyForm windowsForm;
+	Application::Run(%windowsForm);
 }
