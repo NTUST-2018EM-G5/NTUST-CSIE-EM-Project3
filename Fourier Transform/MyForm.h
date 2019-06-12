@@ -133,20 +133,20 @@ namespace FourierTransform {
 					this->setResultImageAsSourceImageToolStripMenuItem
 			});
 			this->fileToolStripMenuItem->Name = L"fileToolStripMenuItem";
-			this->fileToolStripMenuItem->Size = System::Drawing::Size(39, 20);
+			this->fileToolStripMenuItem->Size = System::Drawing::Size(38, 20);
 			this->fileToolStripMenuItem->Text = L"File";
 			// 
 			// loadImageToolStripMenuItem
 			// 
 			this->loadImageToolStripMenuItem->Name = L"loadImageToolStripMenuItem";
-			this->loadImageToolStripMenuItem->Size = System::Drawing::Size(269, 22);
+			this->loadImageToolStripMenuItem->Size = System::Drawing::Size(267, 22);
 			this->loadImageToolStripMenuItem->Text = L"Load Image";
 			this->loadImageToolStripMenuItem->Click += gcnew System::EventHandler(this, &MyForm::loadImageToolStripMenuItem_Click);
 			// 
 			// setResultImageAsSourceImageToolStripMenuItem
 			// 
 			this->setResultImageAsSourceImageToolStripMenuItem->Name = L"setResultImageAsSourceImageToolStripMenuItem";
-			this->setResultImageAsSourceImageToolStripMenuItem->Size = System::Drawing::Size(269, 22);
+			this->setResultImageAsSourceImageToolStripMenuItem->Size = System::Drawing::Size(267, 22);
 			this->setResultImageAsSourceImageToolStripMenuItem->Text = L"Set Result Image as Source Image ";
 			this->setResultImageAsSourceImageToolStripMenuItem->Click += gcnew System::EventHandler(this, &MyForm::setResultImageAsSourceImageToolStripMenuItem_Click);
 			// 
@@ -158,48 +158,52 @@ namespace FourierTransform {
 					this->discreteFourierTransformToolStripMenuItem, this->inverseDiscreteFourierTransformToolStripMenuItem
 			});
 			this->methodToolStripMenuItem->Name = L"methodToolStripMenuItem";
-			this->methodToolStripMenuItem->Size = System::Drawing::Size(66, 20);
+			this->methodToolStripMenuItem->Size = System::Drawing::Size(65, 20);
 			this->methodToolStripMenuItem->Text = L"Method";
 			// 
 			// fastFourierTransformToolStripMenuItem
 			// 
 			this->fastFourierTransformToolStripMenuItem->BackColor = System::Drawing::SystemColors::Info;
 			this->fastFourierTransformToolStripMenuItem->Name = L"fastFourierTransformToolStripMenuItem";
-			this->fastFourierTransformToolStripMenuItem->Size = System::Drawing::Size(265, 22);
+			this->fastFourierTransformToolStripMenuItem->Size = System::Drawing::Size(263, 22);
 			this->fastFourierTransformToolStripMenuItem->Text = L"Fast Fourier Transform";
+			this->fastFourierTransformToolStripMenuItem->Click += gcnew System::EventHandler(this, &MyForm::fastFourierTransformToolStripMenuItem_Click);
 			// 
 			// inverseFastFourierTransformToolStripMenuItem
 			// 
 			this->inverseFastFourierTransformToolStripMenuItem->BackColor = System::Drawing::SystemColors::Info;
 			this->inverseFastFourierTransformToolStripMenuItem->Name = L"inverseFastFourierTransformToolStripMenuItem";
-			this->inverseFastFourierTransformToolStripMenuItem->Size = System::Drawing::Size(265, 22);
+			this->inverseFastFourierTransformToolStripMenuItem->Size = System::Drawing::Size(263, 22);
 			this->inverseFastFourierTransformToolStripMenuItem->Text = L"Inverse Fast Fourier Transform";
+			this->inverseFastFourierTransformToolStripMenuItem->Click += gcnew System::EventHandler(this, &MyForm::inverseFastFourierTransformToolStripMenuItem_Click);
 			// 
 			// lowpassFilterToolStripMenuItem
 			// 
 			this->lowpassFilterToolStripMenuItem->BackColor = System::Drawing::SystemColors::Info;
 			this->lowpassFilterToolStripMenuItem->Name = L"lowpassFilterToolStripMenuItem";
-			this->lowpassFilterToolStripMenuItem->Size = System::Drawing::Size(265, 22);
+			this->lowpassFilterToolStripMenuItem->Size = System::Drawing::Size(263, 22);
 			this->lowpassFilterToolStripMenuItem->Text = L"Lowpass Filter";
+			this->lowpassFilterToolStripMenuItem->Click += gcnew System::EventHandler(this, &MyForm::lowpassFilterToolStripMenuItem_Click);
 			// 
 			// highpassFilterToolStripMenuItem
 			// 
 			this->highpassFilterToolStripMenuItem->BackColor = System::Drawing::SystemColors::Info;
 			this->highpassFilterToolStripMenuItem->Name = L"highpassFilterToolStripMenuItem";
-			this->highpassFilterToolStripMenuItem->Size = System::Drawing::Size(265, 22);
+			this->highpassFilterToolStripMenuItem->Size = System::Drawing::Size(263, 22);
 			this->highpassFilterToolStripMenuItem->Text = L"Highpass Filter";
+			this->highpassFilterToolStripMenuItem->Click += gcnew System::EventHandler(this, &MyForm::highpassFilterToolStripMenuItem_Click);
 			// 
 			// discreteFourierTransformToolStripMenuItem
 			// 
 			this->discreteFourierTransformToolStripMenuItem->Name = L"discreteFourierTransformToolStripMenuItem";
-			this->discreteFourierTransformToolStripMenuItem->Size = System::Drawing::Size(265, 22);
+			this->discreteFourierTransformToolStripMenuItem->Size = System::Drawing::Size(263, 22);
 			this->discreteFourierTransformToolStripMenuItem->Text = L"Discrete Fourier Transform";
 			this->discreteFourierTransformToolStripMenuItem->Click += gcnew System::EventHandler(this, &MyForm::discreteFourierTransformToolStripMenuItem_Click);
 			// 
 			// inverseDiscreteFourierTransformToolStripMenuItem
 			// 
 			this->inverseDiscreteFourierTransformToolStripMenuItem->Name = L"inverseDiscreteFourierTransformToolStripMenuItem";
-			this->inverseDiscreteFourierTransformToolStripMenuItem->Size = System::Drawing::Size(265, 22);
+			this->inverseDiscreteFourierTransformToolStripMenuItem->Size = System::Drawing::Size(263, 22);
 			this->inverseDiscreteFourierTransformToolStripMenuItem->Text = L"Inverse Discrete Fourier Transform";
 			this->inverseDiscreteFourierTransformToolStripMenuItem->Click += gcnew System::EventHandler(this, &MyForm::inverseDiscreteFourierTransformToolStripMenuItem_Click);
 			// 
@@ -290,130 +294,146 @@ namespace FourierTransform {
 	{
 		openFileDialog1->ShowDialog();
 	}
-private: System::Void openFileDialog1_FileOk(System::Object^  sender, System::ComponentModel::CancelEventArgs^  e) 
-{
-	//將影像讀入並設儲存至DataManager的資料結構中
-	Bitmap^ OriginalImage = gcnew Bitmap(openFileDialog1->FileName);
-	pictureBox_SourceImage->Image = OriginalImage;
-	int scale = 1;
-	int M = OriginalImage->Height * scale;
-	int N = OriginalImage->Width * scale;
-
-	dataManager = new DataManager(M,N);
-	for (int i = 0; i < OriginalImage->Height; i++)
+	private: System::Void openFileDialog1_FileOk(System::Object^  sender, System::ComponentModel::CancelEventArgs^  e) 
 	{
-		for (int j = 0; j < OriginalImage->Width; j++)
-		{
-			Color srcColor = OriginalImage->GetPixel(j, i); // 擷取每個點的顏色
-			int srcGrey = srcColor.R*0.299 + srcColor.G*0.587 + srcColor.B*0.144; // 彩色三通道轉成灰階
-			dataManager->SetPixel(j, i, srcGrey);
-		}
-	}
+		//將影像讀入並設儲存至DataManager的資料結構中
+		Bitmap^ OriginalImage = gcnew Bitmap(openFileDialog1->FileName);
+		pictureBox_SourceImage->Image = OriginalImage;
+		int scale = 1;
+		int M = OriginalImage->Height * scale;
+		int N = OriginalImage->Width * scale;
 
-	std::cout << "-Image has been loaded-" << std::endl;
-}
-private: System::Void discreteFourierTransformToolStripMenuItem_Click(System::Object^  sender, System::EventArgs^  e) 
-{
-	int w = dataManager->GetImageWidth();
-	int h = dataManager->GetImageHeight();
-
-	// 利用傅立葉之平移性，平移頻率
-	for (int i = 0; i < h; i++)
-	{
-		for (int j = 0; j < w; j++)
+		dataManager = new DataManager(M,N);
+		for (int i = 0; i < OriginalImage->Height; i++)
 		{
-			int valuePixeli = dataManager->GetInputImage()[i][j];
-			valuePixeli = valuePixeli * pow((float)-1, (float)(i + j)); 
-			dataManager->SetPixel(j, i, valuePixeli);
-		}
-	}
-
-	//將算出頻率資訊傳入輸出影像
-	fourierTransformMethod->DiscreteFourierTransform(dataManager->GetInputImage(),dataManager->GetOutputImage(), dataManager->GetFreqReal(),dataManager->GetFreqImag(),h,w);
-	Bitmap^ DFTImage = gcnew Bitmap(w, h);
-	for (int i = 0; i <h; i++)
-	{
-		for (int j = 0; j <w; j++)
-		{
-			int valuePixeli = dataManager->GetOutputImage()[i][j];
-			if (valuePixeli > 255)
+			for (int j = 0; j < OriginalImage->Width; j++)
 			{
-				valuePixeli = 255;
+				Color srcColor = OriginalImage->GetPixel(j, i); // 擷取每個點的顏色
+				int srcGrey = srcColor.R*0.299 + srcColor.G*0.587 + srcColor.B*0.144; // 彩色三通道轉成灰階
+				dataManager->SetPixel(j, i, srcGrey);
 			}
-			else if (valuePixeli < 0)
+		}
+
+		std::cout << "-Image has been loaded-" << std::endl;
+	}
+	private: System::Void discreteFourierTransformToolStripMenuItem_Click(System::Object^  sender, System::EventArgs^  e) 
+	{
+		int w = dataManager->GetImageWidth();
+		int h = dataManager->GetImageHeight();
+
+		// 利用傅立葉之平移性，平移頻率
+		for (int i = 0; i < h; i++)
+		{
+			for (int j = 0; j < w; j++)
 			{
-				valuePixeli = 0;
+				int valuePixeli = dataManager->GetInputImage()[i][j];
+				valuePixeli = valuePixeli * pow((float)-1, (float)(i + j)); 
+				dataManager->SetPixel(j, i, valuePixeli);
 			}
-			DFTImage->SetPixel(j, i, Color::FromArgb(valuePixeli, valuePixeli, valuePixeli));
 		}
-	}
-	pictureBox_OutputImage->Image = DFTImage;
-}
-private: System::Void inverseDiscreteFourierTransformToolStripMenuItem_Click(System::Object^  sender, System::EventArgs^  e) 
-{
-	int w = dataManager->GetImageWidth();
-	int h = dataManager->GetImageHeight();
 
-	// 利用傅立葉之平移性，平移頻率
-	for (int i = 0; i < h; i++)
-	{
-		for (int j = 0; j < w; j++)
+		//將算出頻率資訊傳入輸出影像
+		fourierTransformMethod->DiscreteFourierTransform(dataManager->GetInputImage(),dataManager->GetOutputImage(), dataManager->GetFreqReal(),dataManager->GetFreqImag(),h,w);
+		Bitmap^ DFTImage = gcnew Bitmap(w, h);
+		for (int i = 0; i <h; i++)
 		{
-			int valuePixeli = dataManager->GetInputImage()[i][j];
-			valuePixeli = valuePixeli * pow((float)-1, (float)(i + j)); 
-			dataManager->SetPixel(j, i, valuePixeli);
+			for (int j = 0; j <w; j++)
+			{
+				int valuePixeli = dataManager->GetOutputImage()[i][j];
+				if (valuePixeli > 255)
+				{
+					valuePixeli = 255;
+				}
+				else if (valuePixeli < 0)
+				{
+					valuePixeli = 0;
+				}
+				DFTImage->SetPixel(j, i, Color::FromArgb(valuePixeli, valuePixeli, valuePixeli));
+			}
 		}
+		pictureBox_OutputImage->Image = DFTImage;
 	}
-	fourierTransformMethod->InverseDiscreteFourierTransform(dataManager->GetInputImage(), dataManager->GetOutputImage(), dataManager->GetFreqReal(), dataManager->GetFreqImag(), h, w);
-
-	//將算出頻率資訊傳入輸出影像
-	Bitmap^ IDFTImage = gcnew Bitmap(w, h);
-	for (int i = 0; i < h; i++)
+	private: System::Void inverseDiscreteFourierTransformToolStripMenuItem_Click(System::Object^  sender, System::EventArgs^  e) 
 	{
-		for (int j = 0; j <w; j++)
+		int w = dataManager->GetImageWidth();
+		int h = dataManager->GetImageHeight();
+
+		// 利用傅立葉之平移性，平移頻率
+		for (int i = 0; i < h; i++)
 		{
-			int valuePixeli = dataManager->GetOutputImage()[i][j]; 
+			for (int j = 0; j < w; j++)
+			{
+				int valuePixeli = dataManager->GetInputImage()[i][j];
+				valuePixeli = valuePixeli * pow((float)-1, (float)(i + j)); 
+				dataManager->SetPixel(j, i, valuePixeli);
+			}
+		}
+		fourierTransformMethod->InverseDiscreteFourierTransform(dataManager->GetInputImage(), dataManager->GetOutputImage(), dataManager->GetFreqReal(), dataManager->GetFreqImag(), h, w);
+
+		//將算出頻率資訊傳入輸出影像
+		Bitmap^ IDFTImage = gcnew Bitmap(w, h);
+		for (int i = 0; i < h; i++)
+		{
+			for (int j = 0; j <w; j++)
+			{
+				int valuePixeli = dataManager->GetOutputImage()[i][j]; 
 			
-			if (valuePixeli > 255)
-			{
-				valuePixeli = 255;
+				if (valuePixeli > 255)
+				{
+					valuePixeli = 255;
+				}
+				else if (valuePixeli < 0)
+				{
+					valuePixeli = 0;
+				}
+				IDFTImage->SetPixel(j, i, Color::FromArgb(valuePixeli, valuePixeli, valuePixeli));
 			}
-			else if (valuePixeli < 0)
-			{
-				valuePixeli = 0;
-			}
-			IDFTImage->SetPixel(j, i, Color::FromArgb(valuePixeli, valuePixeli, valuePixeli));
 		}
+
+		pictureBox_OutputImage->Image = IDFTImage;
 	}
-
-	pictureBox_OutputImage->Image = IDFTImage;
-}
-private: System::Void setResultImageAsSourceImageToolStripMenuItem_Click(System::Object^  sender, System::EventArgs^  e) 
-{
-	int w = dataManager->GetImageWidth();
-	int h = dataManager->GetImageHeight();
-	Bitmap^ sImage = gcnew Bitmap(w, h);
-
-	//將當前輸出影像作為輸入影像
-	for (int i = 0; i <w; i++)
+	private: System::Void setResultImageAsSourceImageToolStripMenuItem_Click(System::Object^  sender, System::EventArgs^  e) 
 	{
-		for (int j = 0; j < h; j++)
+		int w = dataManager->GetImageWidth();
+		int h = dataManager->GetImageHeight();
+		Bitmap^ sImage = gcnew Bitmap(w, h);
+
+		//將當前輸出影像作為輸入影像
+		for (int i = 0; i <w; i++)
 		{
-			int valuePixeli = dataManager->GetOutputImage()[i][j];
+			for (int j = 0; j < h; j++)
+			{
+				int valuePixeli = dataManager->GetOutputImage()[i][j];
 			
-			if (valuePixeli > 255)
-			{
-				valuePixeli = 255;
+				if (valuePixeli > 255)
+				{
+					valuePixeli = 255;
+				}
+				else if (valuePixeli < 0)
+				{
+					valuePixeli = 0;
+				}
+				dataManager->SetPixel(j, i, valuePixeli);
+				sImage->SetPixel(j, i, Color::FromArgb(valuePixeli, valuePixeli, valuePixeli));
 			}
-			else if (valuePixeli < 0)
-			{
-				valuePixeli = 0;
-			}
-			dataManager->SetPixel(j, i, valuePixeli);
-			sImage->SetPixel(j, i, Color::FromArgb(valuePixeli, valuePixeli, valuePixeli));
 		}
+		pictureBox_SourceImage->Image = sImage;
 	}
-	pictureBox_SourceImage->Image = sImage;
-}
+	private: System::Void fastFourierTransformToolStripMenuItem_Click(System::Object^  sender, System::EventArgs^  e) 
+	{
+
+	}
+	private: System::Void inverseFastFourierTransformToolStripMenuItem_Click(System::Object^  sender, System::EventArgs^  e) 
+	{
+
+	}
+	private: System::Void lowpassFilterToolStripMenuItem_Click(System::Object^  sender, System::EventArgs^  e) 
+	{
+
+	}
+	private: System::Void highpassFilterToolStripMenuItem_Click(System::Object^  sender, System::EventArgs^  e) 
+	{
+
+	}
 };
 }
