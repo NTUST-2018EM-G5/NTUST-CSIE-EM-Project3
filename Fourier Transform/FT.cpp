@@ -159,25 +159,213 @@ void FT::InverseDFT(double ** InverseReal, double ** InverseImag, double ** pFre
 
 void FT::FastFourierTransform(int ** InputImage, int ** OutputImage, double ** FreqReal, double ** FreqImag, int h, int w)
 {
+	int M = h;
+	int N = w;
+
+	std::complex<double>** outputComplex = new std::complex<double>*[M];
+
+	for (int i = 0; i < N; i++) outputComplex[i] = new std::complex<double>[N];
+
+	for (int i = 0; i < M; i++) 
+	{
+		for (int j = 0; j < N; j++) 
+		{
+			std::complex<double> temp(InputImage[j][i], 0);
+			outputComplex[i][j] = temp;
+		}
+	}
+	for (int i = 0; i < M; i++) 
+	{
+		std::complex<double> *input = new std::complex<double>[M];
+		for (int j = 0; j < M; j++) input[j] = outputComplex[j][i];
+		FFT(M, input);
+		for (int j = 0; j < M; j++) outputComplex[j][i] = input[j];
+		free(input);
+	}
+	for (int i = 0; i < N; i++) 
+	{
+		std::complex<double> *input = new std::complex<double>[N];
+		for (int j = 0; j < N; ++j) input[j] = outputComplex[i][j];
+		FFT(N, input);
+		for (int j = 0; j < N; ++j) outputComplex[i][j] = input[j];
+		free(input);
+	}
+	for (int i = 0; i < M; i++) 
+	{
+		for (int j = 0; j < N; j++) 
+		{
+			FreqImag[i][j] = outputComplex[i][j].imag();
+			FreqReal[i][j] = outputComplex[i][j].real();
+			OutputImage[i][j] = hypot(outputComplex[i][j].real(), outputComplex[i][j].imag()) *N;
+		}
+	}
+
+	for (int i = 0; i < M; ++i) free(outputComplex[i]);
+	free(outputComplex);
 }
 
-void FT::FFT(double ** pFreqReal, double ** pFreqImag, int ** InputImage, int h, int w, int u, int v)
+void FT::FFT(int N, std::complex<double>* x)
 {
+	for (int i = 1, j = 0; i < N; ++i) 
+	{
+		for (int k = N >> 1; !((j ^= k)&k); k >>= 1);
+		if (i > j) swap(x[i], x[j]);
+	}
+
+	for (int k = 2; k <= N; k <<= 1) 
+	{
+		double omega = -2.0 * PI / (1.0*k);
+		std::complex<double> dtheta(cos(omega), sin(omega));
+		for (int j = 0; j < N; j += k) 
+		{
+			std::complex<double> theta(1, 0);
+			for (int i = j; i < j + k / 2; i++) 
+			{
+				std::complex<double> a = x[i];
+				std::complex<double> b = x[i + k / 2] * theta;
+				x[i] = a + b;
+				x[i + k / 2] = a - b;
+				theta *= dtheta;
+			}
+		}
+	}
+	for (int i = 0; i < N; i++) x[i] /= N;
 }
 
 void FT::InverseFastFourierTransform(int ** InputImage, int ** OutputImage, double ** FreqReal, double ** FreqImag, int h, int w)
 {
+	int M = h;
+	int N = w;
+
+	std::complex<double>** outputComplex = new std::complex<double>*[M];
+
+	for (int i = 0; i < N; i++)outputComplex[i] = new std::complex<double>[N];
+
+	for (int i = 0; i < M; i++) {
+		for (int j = 0; j < N; j++) {
+			std::complex<double> temp(FreqReal[j][i], FreqImag[j][i]);
+			outputComplex[i][j] = temp;
+		}
+	}
+	for (int i = 0; i < M; i++) {
+		std::complex<double> *input = new std::complex<double>[M];
+		for (int j = 0; j < M; j++)
+			input[j] = std::complex<double>(outputComplex[i][j].real()*N, outputComplex[i][j].imag()*N);
+		InverseFFT(M, input);
+		for (int j = 0; j < M; j++)
+			outputComplex[i][j] = input[j];
+		free(input);
+	}
+	for (int i = 0; i < N; i++) {
+		std::complex<double> *input = new std::complex<double>[N];
+		for (int j = 0; j < N; ++j)
+			input[j] = std::complex<double>(outputComplex[j][i].real()*N, outputComplex[j][i].imag()*N);
+		InverseFFT(N, input);
+		for (int j = 0; j < N; ++j)
+			outputComplex[j][i] = input[j];
+		free(input);
+	}
+	double max_s = -100;
+	for (int i = 0; i < M; i++) {
+		for (int j = 0; j < N; j++) {
+			FreqImag[i][j] = outputComplex[i][j].imag();
+			FreqReal[i][j] = outputComplex[i][j].real();
+			OutputImage[i][j] = hypot(outputComplex[i][j].real(), outputComplex[i][j].imag());
+			max_s < OutputImage[i][j] ? max_s = OutputImage[i][j] : 0;
+		}
+	}
+	max_s /= 255;
+	max_s = 1.0f / max_s;
+	for (int i = 0; i < M; i++)
+		for (int j = 0; j < N; j++)
+			OutputImage[i][j] *= max_s;
+
+	for (int i = M - 1; i >= M / 2; i--) {
+		for (int j = N - 1; j >= 0; j--) {
+			double temp = OutputImage[i][j];
+			OutputImage[i][j] = OutputImage[M - i][j];
+			OutputImage[M - i][j] = temp;
+		}
+	}
+	for (int i = M - 1; i >= 0; i--) {
+		for (int j = N - 1; j >= N / 2; j--) {
+			double temp = OutputImage[i][j];
+			OutputImage[i][j] = OutputImage[i][N - j];
+			OutputImage[i][N - j] = temp;
+		}
+	}
+	for (int i = 0; i < M; ++i)
+		free(outputComplex[i]);
+	free(outputComplex);
 }
 
-void FT::InverseFFT(double ** InverseReal, double ** InverseImag, double ** pFreqReal, double ** pFreqImag, int h, int w, int x, int y)
+void FT::InverseFFT(int N, std::complex<double>* x)
 {
+	for (int i = 1, j = 0; i < N; ++i) {
+		for (int k = N >> 1; !((j ^= k)&k); k >>= 1);
+		if (i > j) swap(x[i], x[j]);
+	}
+	for (int k = 2; k <= N; k <<= 1) {
+		double omega = -2.0 * PI / (1.0*k);
+		std::complex<double> dtheta(cos(omega), sin(omega));
+		for (int j = 0; j < N; j += k) {
+			std::complex<double> theta(1, 0);
+			for (int i = j; i < j + k / 2; i++) {
+				std::complex<double> a = x[i];
+				std::complex<double> b = x[i + k / 2] * theta;
+				x[i] = a + b;
+				x[i + k / 2] = a - b;
+				theta *= dtheta;
+			}
+		}
+	}
 }
 
 
-void FT::LowpassFilter(double** Real, double** Img, double** filter)
+void FT::LowpassFilter(int** InputImage, int** OutputImage, double** Real, double** Img, int h, int w)
 {
+	int threshold = h * 0.125;
+	int x = h / 2;
+	int y = w / 2;
+	for (int i = 0; i < h; i++) 
+	{
+		for (int j = 0; j < w; j++) 
+		{
+			int d = hypot(i - x, j - y);
+			if (d < threshold) //LOW PASS
+			{
+				OutputImage[i][j] = InputImage[i][j];
+			}
+			else 
+			{
+				OutputImage[i][j] = 0;
+				Real[i][j] = 0;
+				Img[i][j] = 0;
+			}
+		}
+	}
 }
 
-void FT::HighpassFilter(double** Real, double** Img, double** filter)
+void FT::HighpassFilter(int** InputImage, int** OutputImage, double** Real, double** Img, int h, int w)
 {
+	int threshold = h * 0.125;
+	int x = h / 2;
+	int y = w / 2;
+	for (int i = 0; i < h; i++) 
+	{
+		for (int j = 0; j < w; j++) 
+		{
+			int d = hypot(i - x, j - y);
+			if (d > threshold) //HIGH PASS
+			{
+				OutputImage[i][j] = InputImage[i][j];
+			}
+			else 
+			{
+				OutputImage[i][j] = 0;
+				Real[i][j] = 0;
+				Img[i][j] = 0;
+			}
+		}
+	}
 }

@@ -277,6 +277,7 @@ namespace FourierTransform {
 			this->Controls->Add(this->tableLayoutPanel1);
 			this->MainMenuStrip = this->menuStrip1;
 			this->Name = L"MyForm";
+			this->StartPosition = System::Windows::Forms::FormStartPosition::CenterScreen;
 			this->Text = L"FourierTransform";
 			this->tableLayoutPanel1->ResumeLayout(false);
 			this->tableLayoutPanel1->PerformLayout();
@@ -421,19 +422,129 @@ namespace FourierTransform {
 	}
 	private: System::Void fastFourierTransformToolStripMenuItem_Click(System::Object^  sender, System::EventArgs^  e) 
 	{
+		int w = dataManager->GetImageWidth();
+		int h = dataManager->GetImageHeight();
 
+		// 利用傅立葉之平移性，平移頻率
+		for (int i = 0; i < h; i++)
+		{
+			for (int j = 0; j < w; j++)
+			{
+				int valuePixeli = dataManager->GetInputImage()[i][j];
+				valuePixeli = valuePixeli * pow((float)-1, (float)(i + j));
+				dataManager->SetPixel(j, i, valuePixeli);
+			}
+		}
+
+		//將算出頻率資訊傳入輸出影像
+		fourierTransformMethod->FastFourierTransform(dataManager->GetInputImage(), dataManager->GetOutputImage(), dataManager->GetFreqReal(), dataManager->GetFreqImag(), h, w);
+		Bitmap^ FFTImage = gcnew Bitmap(w, h);
+		for (int i = 0; i < h; i++)
+		{
+			for (int j = 0; j < w; j++)
+			{
+				int valuePixeli = dataManager->GetOutputImage()[i][j];
+				if (valuePixeli > 255)
+				{
+					valuePixeli = 255;
+				}
+				else if (valuePixeli < 0)
+				{
+					valuePixeli = 0;
+				}
+				FFTImage->SetPixel(j, i, Color::FromArgb(valuePixeli, valuePixeli, valuePixeli));
+			}
+		}
+		pictureBox_OutputImage->Image = FFTImage;
 	}
 	private: System::Void inverseFastFourierTransformToolStripMenuItem_Click(System::Object^  sender, System::EventArgs^  e) 
 	{
+		int w = dataManager->GetImageWidth();
+		int h = dataManager->GetImageHeight();
 
+		// 利用傅立葉之平移性，平移頻率
+		for (int i = 0; i < h; i++)
+		{
+			for (int j = 0; j < w; j++)
+			{
+				int valuePixeli = dataManager->GetInputImage()[i][j];
+				valuePixeli = valuePixeli * pow((float)-1, (float)(i + j));
+				dataManager->SetPixel(j, i, valuePixeli);
+			}
+		}
+
+		//將算出頻率資訊傳入輸出影像
+		fourierTransformMethod->InverseFastFourierTransform(dataManager->GetInputImage(), dataManager->GetOutputImage(), dataManager->GetFreqReal(), dataManager->GetFreqImag(), h, w);
+		Bitmap^ IFTImage = gcnew Bitmap(w, h);
+		for (int i = 0; i < h; i++)
+		{
+			for (int j = 0; j < w; j++)
+			{
+				int valuePixeli = dataManager->GetOutputImage()[i][j];
+				if (valuePixeli > 255)
+				{
+					valuePixeli = 255;
+				}
+				else if (valuePixeli < 0)
+				{
+					valuePixeli = 0;
+				}
+				IFTImage->SetPixel(j, i, Color::FromArgb(valuePixeli, valuePixeli, valuePixeli));
+			}
+		}
+		pictureBox_OutputImage->Image = IFTImage;
 	}
 	private: System::Void lowpassFilterToolStripMenuItem_Click(System::Object^  sender, System::EventArgs^  e) 
 	{
+		int w = dataManager->GetImageWidth();
+		int h = dataManager->GetImageHeight();
 
+		//將算出頻率資訊傳入輸出影像
+		fourierTransformMethod->LowpassFilter(dataManager->GetInputImage(), dataManager->GetOutputImage(), dataManager->GetFreqReal(), dataManager->GetFreqImag(), h, w);
+		Bitmap^ LPFImage = gcnew Bitmap(w, h);
+		for (int i = 0; i < h; i++)
+		{
+			for (int j = 0; j < w; j++)
+			{
+				int valuePixeli = dataManager->GetOutputImage()[i][j];
+				if (valuePixeli > 255)
+				{
+					valuePixeli = 255;
+				}
+				else if (valuePixeli < 0)
+				{
+					valuePixeli = 0;
+				}
+				LPFImage->SetPixel(j, i, Color::FromArgb(valuePixeli, valuePixeli, valuePixeli));
+			}
+		}
+		pictureBox_OutputImage->Image = LPFImage;
 	}
 	private: System::Void highpassFilterToolStripMenuItem_Click(System::Object^  sender, System::EventArgs^  e) 
 	{
+		int w = dataManager->GetImageWidth();
+		int h = dataManager->GetImageHeight();
 
+		//將算出頻率資訊傳入輸出影像
+		fourierTransformMethod->LowpassFilter(dataManager->GetInputImage(), dataManager->GetOutputImage(), dataManager->GetFreqReal(), dataManager->GetFreqImag(), h, w);
+		Bitmap^ HPFImage = gcnew Bitmap(w, h);
+		for (int i = 0; i < h; i++)
+		{
+			for (int j = 0; j < w; j++)
+			{
+				int valuePixeli = dataManager->GetOutputImage()[i][j];
+				if (valuePixeli > 255)
+				{
+					valuePixeli = 255;
+				}
+				else if (valuePixeli < 0)
+				{
+					valuePixeli = 0;
+				}
+				HPFImage->SetPixel(j, i, Color::FromArgb(valuePixeli, valuePixeli, valuePixeli));
+			}
+		}
+		pictureBox_OutputImage->Image = HPFImage;
 	}
 };
 }
