@@ -356,195 +356,237 @@ namespace FourierTransform {
 	}
 	private: System::Void inverseDiscreteFourierTransformToolStripMenuItem_Click(System::Object^  sender, System::EventArgs^  e) 
 	{
-		int w = dataManager->GetImageWidth();
-		int h = dataManager->GetImageHeight();
-
-		// 利用傅立葉之平移性，平移頻率
-		for (int i = 0; i < h; i++)
+		try
 		{
-			for (int j = 0; j < w; j++)
-			{
-				int valuePixeli = dataManager->GetInputImage()[i][j];
-				valuePixeli = valuePixeli * pow((float)-1, (float)(i + j)); 
-				dataManager->SetPixel(j, i, valuePixeli);
-			}
-		}
-		fourierTransformMethod->InverseDiscreteFourierTransform(dataManager->GetInputImage(), dataManager->GetOutputImage(), dataManager->GetFreqReal(), dataManager->GetFreqImag(), h, w);
+			int w = dataManager->GetImageWidth();
+			int h = dataManager->GetImageHeight();
 
-		//將算出頻率資訊傳入輸出影像
-		Bitmap^ IDFTImage = gcnew Bitmap(w, h);
-		for (int i = 0; i < h; i++)
+			// 利用傅立葉之平移性，平移頻率
+			for (int i = 0; i < h; i++)
+			{
+				for (int j = 0; j < w; j++)
+				{
+					int valuePixeli = dataManager->GetInputImage()[i][j];
+					valuePixeli = valuePixeli * pow((float)-1, (float)(i + j));
+					dataManager->SetPixel(j, i, valuePixeli);
+				}
+			}
+			fourierTransformMethod->InverseDiscreteFourierTransform(dataManager->GetInputImage(), dataManager->GetOutputImage(), dataManager->GetFreqReal(), dataManager->GetFreqImag(), h, w);
+
+			//將算出頻率資訊傳入輸出影像
+			Bitmap^ IDFTImage = gcnew Bitmap(w, h);
+			for (int i = 0; i < h; i++)
+			{
+				for (int j = 0; j < w; j++)
+				{
+					int valuePixeli = dataManager->GetOutputImage()[i][j];
+
+					if (valuePixeli > 255)
+					{
+						valuePixeli = 255;
+					}
+					else if (valuePixeli < 0)
+					{
+						valuePixeli = 0;
+					}
+					IDFTImage->SetPixel(j, i, Color::FromArgb(valuePixeli, valuePixeli, valuePixeli));
+				}
+			}
+
+			pictureBox_OutputImage->Image = IDFTImage;
+		}
+		catch (...)
 		{
-			for (int j = 0; j <w; j++)
-			{
-				int valuePixeli = dataManager->GetOutputImage()[i][j]; 
-			
-				if (valuePixeli > 255)
-				{
-					valuePixeli = 255;
-				}
-				else if (valuePixeli < 0)
-				{
-					valuePixeli = 0;
-				}
-				IDFTImage->SetPixel(j, i, Color::FromArgb(valuePixeli, valuePixeli, valuePixeli));
-			}
+			MessageBox::Show("Error!");
 		}
-
-		pictureBox_OutputImage->Image = IDFTImage;
 	}
 	private: System::Void setResultImageAsSourceImageToolStripMenuItem_Click(System::Object^  sender, System::EventArgs^  e) 
 	{
-		int w = dataManager->GetImageWidth();
-		int h = dataManager->GetImageHeight();
-		Bitmap^ sImage = gcnew Bitmap(w, h);
-
-		//將當前輸出影像作為輸入影像
-		for (int i = 0; i <w; i++)
+		try
 		{
-			for (int j = 0; j < h; j++)
+			int w = dataManager->GetImageWidth();
+			int h = dataManager->GetImageHeight();
+			Bitmap^ sImage = gcnew Bitmap(w, h);
+
+			//將當前輸出影像作為輸入影像
+			for (int i = 0; i < w; i++)
 			{
-				int valuePixeli = dataManager->GetOutputImage()[i][j];
-			
-				if (valuePixeli > 255)
+				for (int j = 0; j < h; j++)
 				{
-					valuePixeli = 255;
+					int valuePixeli = dataManager->GetOutputImage()[i][j];
+
+					if (valuePixeli > 255)
+					{
+						valuePixeli = 255;
+					}
+					else if (valuePixeli < 0)
+					{
+						valuePixeli = 0;
+					}
+					dataManager->SetPixel(j, i, valuePixeli);
+					sImage->SetPixel(j, i, Color::FromArgb(valuePixeli, valuePixeli, valuePixeli));
 				}
-				else if (valuePixeli < 0)
-				{
-					valuePixeli = 0;
-				}
-				dataManager->SetPixel(j, i, valuePixeli);
-				sImage->SetPixel(j, i, Color::FromArgb(valuePixeli, valuePixeli, valuePixeli));
 			}
+			pictureBox_SourceImage->Image = sImage;
 		}
-		pictureBox_SourceImage->Image = sImage;
+		catch (...)
+		{
+			MessageBox::Show("Error!");
+		}
 	}
 	private: System::Void fastFourierTransformToolStripMenuItem_Click(System::Object^  sender, System::EventArgs^  e) 
 	{
-		int w = dataManager->GetImageWidth();
-		int h = dataManager->GetImageHeight();
-
-		// 利用傅立葉之平移性，平移頻率
-		for (int i = 0; i < h; i++)
+		try
 		{
-			for (int j = 0; j < w; j++)
-			{
-				int valuePixeli = dataManager->GetInputImage()[i][j];
-				valuePixeli = valuePixeli * pow((float)-1, (float)(i + j));
-				dataManager->SetPixel(j, i, valuePixeli);
-			}
-		}
+			int w = dataManager->GetImageWidth();
+			int h = dataManager->GetImageHeight();
 
-		//將算出頻率資訊傳入輸出影像
-		fourierTransformMethod->FastFourierTransform(dataManager->GetInputImage(), dataManager->GetOutputImage(), dataManager->GetFreqReal(), dataManager->GetFreqImag(), h, w);
-		Bitmap^ FFTImage = gcnew Bitmap(w, h);
-		for (int i = 0; i < h; i++)
-		{
-			for (int j = 0; j < w; j++)
+			// 利用傅立葉之平移性，平移頻率
+			for (int i = 0; i < h; i++)
 			{
-				int valuePixeli = dataManager->GetOutputImage()[i][j];
-				if (valuePixeli > 255)
+				for (int j = 0; j < w; j++)
 				{
-					valuePixeli = 255;
+					int valuePixeli = dataManager->GetInputImage()[i][j];
+					valuePixeli = valuePixeli * pow((float)-1, (float)(i + j));
+					dataManager->SetPixel(j, i, valuePixeli);
 				}
-				else if (valuePixeli < 0)
-				{
-					valuePixeli = 0;
-				}
-				FFTImage->SetPixel(j, i, Color::FromArgb(valuePixeli, valuePixeli, valuePixeli));
 			}
+
+			//將算出頻率資訊傳入輸出影像
+			fourierTransformMethod->FastFourierTransform(dataManager->GetInputImage(), dataManager->GetOutputImage(), dataManager->GetFreqReal(), dataManager->GetFreqImag(), h, w);
+			Bitmap^ FFTImage = gcnew Bitmap(w, h);
+			for (int i = 0; i < h; i++)
+			{
+				for (int j = 0; j < w; j++)
+				{
+					int valuePixeli = dataManager->GetOutputImage()[i][j];
+					if (valuePixeli > 255)
+					{
+						valuePixeli = 255;
+					}
+					else if (valuePixeli < 0)
+					{
+						valuePixeli = 0;
+					}
+					FFTImage->SetPixel(j, i, Color::FromArgb(valuePixeli, valuePixeli, valuePixeli));
+				}
+			}
+			pictureBox_OutputImage->Image = FFTImage;
 		}
-		pictureBox_OutputImage->Image = FFTImage;
+		catch(...)
+		{
+			MessageBox::Show("Error!");
+		}
 	}
 	private: System::Void inverseFastFourierTransformToolStripMenuItem_Click(System::Object^  sender, System::EventArgs^  e) 
 	{
-		int w = dataManager->GetImageWidth();
-		int h = dataManager->GetImageHeight();
-
-		// 利用傅立葉之平移性，平移頻率
-		for (int i = 0; i < h; i++)
+		try
 		{
-			for (int j = 0; j < w; j++)
-			{
-				int valuePixeli = dataManager->GetInputImage()[i][j];
-				valuePixeli = valuePixeli * pow((float)-1, (float)(i + j));
-				dataManager->SetPixel(j, i, valuePixeli);
-			}
-		}
+			int w = dataManager->GetImageWidth();
+			int h = dataManager->GetImageHeight();
 
-		//將算出頻率資訊傳入輸出影像
-		fourierTransformMethod->InverseFastFourierTransform(dataManager->GetInputImage(), dataManager->GetOutputImage(), dataManager->GetFreqReal(), dataManager->GetFreqImag(), h, w);
-		Bitmap^ IFTImage = gcnew Bitmap(w, h);
-		for (int i = 0; i < h; i++)
-		{
-			for (int j = 0; j < w; j++)
+			// 利用傅立葉之平移性，平移頻率
+			for (int i = 0; i < h; i++)
 			{
-				int valuePixeli = dataManager->GetOutputImage()[i][j];
-				if (valuePixeli > 255)
+				for (int j = 0; j < w; j++)
 				{
-					valuePixeli = 255;
+					int valuePixeli = dataManager->GetInputImage()[i][j];
+					valuePixeli = valuePixeli * pow((float)-1, (float)(i + j));
+					dataManager->SetPixel(j, i, valuePixeli);
 				}
-				else if (valuePixeli < 0)
-				{
-					valuePixeli = 0;
-				}
-				IFTImage->SetPixel(j, i, Color::FromArgb(valuePixeli, valuePixeli, valuePixeli));
 			}
+
+			//將算出頻率資訊傳入輸出影像
+			fourierTransformMethod->InverseFastFourierTransform(dataManager->GetInputImage(), dataManager->GetOutputImage(), dataManager->GetFreqReal(), dataManager->GetFreqImag(), h, w);
+			Bitmap^ IFTImage = gcnew Bitmap(w, h);
+			for (int i = 0; i < h; i++)
+			{
+				for (int j = 0; j < w; j++)
+				{
+					int valuePixeli = dataManager->GetOutputImage()[i][j];
+					if (valuePixeli > 255)
+					{
+						valuePixeli = 255;
+					}
+					else if (valuePixeli < 0)
+					{
+						valuePixeli = 0;
+					}
+					IFTImage->SetPixel(j, i, Color::FromArgb(valuePixeli, valuePixeli, valuePixeli));
+				}
+			}
+			pictureBox_OutputImage->Image = IFTImage;
 		}
-		pictureBox_OutputImage->Image = IFTImage;
+		catch (...)
+		{
+			MessageBox::Show("Error!");
+		}
 	}
 	private: System::Void lowpassFilterToolStripMenuItem_Click(System::Object^  sender, System::EventArgs^  e) 
 	{
-		int w = dataManager->GetImageWidth();
-		int h = dataManager->GetImageHeight();
-
-		//將算出頻率資訊傳入輸出影像
-		fourierTransformMethod->LowpassFilter(dataManager->GetInputImage(), dataManager->GetOutputImage(), dataManager->GetFreqReal(), dataManager->GetFreqImag(), h, w);
-		Bitmap^ LPFImage = gcnew Bitmap(w, h);
-		for (int i = 0; i < h; i++)
+		try
 		{
-			for (int j = 0; j < w; j++)
+			int w = dataManager->GetImageWidth();
+			int h = dataManager->GetImageHeight();
+
+			//將算出頻率資訊傳入輸出影像
+			fourierTransformMethod->LowpassFilter(dataManager->GetInputImage(), dataManager->GetOutputImage(), dataManager->GetFreqReal(), dataManager->GetFreqImag(), h, w);
+			Bitmap^ LPFImage = gcnew Bitmap(w, h);
+			for (int i = 0; i < h; i++)
 			{
-				int valuePixeli = dataManager->GetOutputImage()[i][j];
-				if (valuePixeli > 255)
+				for (int j = 0; j < w; j++)
 				{
-					valuePixeli = 255;
+					int valuePixeli = dataManager->GetOutputImage()[i][j];
+					if (valuePixeli > 255)
+					{
+						valuePixeli = 255;
+					}
+					else if (valuePixeli < 0)
+					{
+						valuePixeli = 0;
+					}
+					LPFImage->SetPixel(j, i, Color::FromArgb(valuePixeli, valuePixeli, valuePixeli));
 				}
-				else if (valuePixeli < 0)
-				{
-					valuePixeli = 0;
-				}
-				LPFImage->SetPixel(j, i, Color::FromArgb(valuePixeli, valuePixeli, valuePixeli));
 			}
+			pictureBox_OutputImage->Image = LPFImage;
 		}
-		pictureBox_OutputImage->Image = LPFImage;
+		catch (...)
+		{
+			MessageBox::Show("Error!");
+		}
 	}
 	private: System::Void highpassFilterToolStripMenuItem_Click(System::Object^  sender, System::EventArgs^  e) 
 	{
-		int w = dataManager->GetImageWidth();
-		int h = dataManager->GetImageHeight();
-
-		//將算出頻率資訊傳入輸出影像
-		fourierTransformMethod->LowpassFilter(dataManager->GetInputImage(), dataManager->GetOutputImage(), dataManager->GetFreqReal(), dataManager->GetFreqImag(), h, w);
-		Bitmap^ HPFImage = gcnew Bitmap(w, h);
-		for (int i = 0; i < h; i++)
+		try
 		{
-			for (int j = 0; j < w; j++)
+			int w = dataManager->GetImageWidth();
+			int h = dataManager->GetImageHeight();
+
+			//將算出頻率資訊傳入輸出影像
+			fourierTransformMethod->HighpassFilter(dataManager->GetInputImage(), dataManager->GetOutputImage(), dataManager->GetFreqReal(), dataManager->GetFreqImag(), h, w);
+			Bitmap^ HPFImage = gcnew Bitmap(w, h);
+			for (int i = 0; i < h; i++)
 			{
-				int valuePixeli = dataManager->GetOutputImage()[i][j];
-				if (valuePixeli > 255)
+				for (int j = 0; j < w; j++)
 				{
-					valuePixeli = 255;
+					int valuePixeli = dataManager->GetOutputImage()[i][j];
+					if (valuePixeli > 255)
+					{
+						valuePixeli = 255;
+					}
+					else if (valuePixeli < 0)
+					{
+						valuePixeli = 0;
+					}
+					HPFImage->SetPixel(j, i, Color::FromArgb(valuePixeli, valuePixeli, valuePixeli));
 				}
-				else if (valuePixeli < 0)
-				{
-					valuePixeli = 0;
-				}
-				HPFImage->SetPixel(j, i, Color::FromArgb(valuePixeli, valuePixeli, valuePixeli));
 			}
+			pictureBox_OutputImage->Image = HPFImage;
 		}
-		pictureBox_OutputImage->Image = HPFImage;
+		catch (...)
+		{
+			MessageBox::Show("Error!");
+		}
 	}
 };
 }
